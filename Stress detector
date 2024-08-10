@@ -1,0 +1,31 @@
+from flask import Flask, request, render_template, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///space_mood_stress.db'
+db = SQLAlchemy(app)
+
+class MoodLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    mood = db.Column(db.String(50), nullable=False)
+    stress_level = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+@app.route('/')
+def index():
+    logs = MoodLog.query.order_by(MoodLog.timestamp.desc()).all()
+    return render_template('index.html', logs=logs)
+
+@app.route('/add', methods=['POST'])
+def add_log():
+    mood = request.form.get('mood')
+    stress_level = request.form.get('stress_level')
+    new_log = MoodLog(mood=mood, stress_level=stress_level)
+    db.session.add(new_log)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    db.create_all()
+    app.run(debug=True)
+
