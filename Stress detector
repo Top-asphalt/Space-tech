@@ -29,3 +29,39 @@ if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
 
+#lighting control 
+
+from phue import Bridge
+from datetime import datetime, timedelta
+
+BRIDGE_IP = '192.168.1.100'
+bridge = Bridge(BRIDGE_IP)
+bridge.connect()
+
+def set_lights_on(lights, state=True):
+    bridge.set_light(lights, 'on', state)
+
+def set_brightness(lights, brightness):
+    bridge.set_light(lights, 'bri', brightness)
+
+def set_color(lights, hue_value):
+    bridge.set_light(lights, 'hue', hue_value)
+
+def schedule_light(light_id, on_time, off_time):
+    # Placeholder for scheduling implementation
+    print(f"Scheduled light {light_id} to turn on at {on_time} and off at {off_time}")
+
+def main():
+    # Example usage
+    set_lights_on([1, 2], True)
+    set_brightness([1, 2], 200)
+    set_color([1], 50000)
+    
+    now = datetime.now()
+    on_time = now + timedelta(minutes=1)
+    off_time = now + timedelta(minutes=5)
+    
+    schedule_light(1, on_time, off_time)
+
+if __name__ == '__main__':
+    main()
